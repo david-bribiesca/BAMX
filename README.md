@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # BAMX Guadalajara — Food Bank App (checkpoint demo)
 
 React Native (Expo Router) + Supabase. This checkpoint build shows the four
@@ -70,3 +71,6 @@ src/
   theme.ts             # BAMX design tokens
 supabase/schema.sql    # run this in the Supabase SQL editor
 ```
+=======
+# BAMX
+>>>>>>> 9e8b0b3ed63e2b529b5d3ba2a1abc00f365f32aa

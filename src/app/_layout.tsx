@@ -20,7 +20,7 @@ function RootNavigator() {
     if (!session && !inAuthGroup) {
       router.replace('/(auth)/login');
     } else if (session && inAuthGroup) {
-      router.replace('/(app)/home');
+      router.replace('/(app)/map');
     }
   }, [session, loading, segments]);
 

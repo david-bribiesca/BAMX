@@ -1,10 +1,8 @@
-// Login screen — matches mockup p.1 ("Menú principal").
-// Role selector + email/password. Shows a clear error on wrong credentials.
+// Login screen (donor-only). Email/password; shows a clear error on bad creds.
 import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,16 +13,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Brand } from '@/components/Brand';
 import { Field, PrimaryButton } from '@/components/ui';
 import { supabase } from '@/lib/supabase';
-import { colors, radius, spacing } from '@/theme';
-
-const ROLES = [
-  { key: 'donor', title: 'Donador', subtitle: 'Quiero donar y apoyar', emoji: '💛' },
-  { key: 'beneficiary', title: 'Necesito apoyo', subtitle: 'Quiero recibir ayuda', emoji: '🙌' },
-  { key: 'staff', title: 'Staff BAMX', subtitle: 'Soy del equipo BAMX', emoji: '⭐' },
-] as const;
+import { colors, spacing } from '@/theme';
 
 export default function Login() {
-  const [role, setRole] = useState<string>('donor');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -66,31 +57,10 @@ export default function Login() {
             <Brand />
           </View>
 
-          <Text style={styles.question}>¿Cómo quieres entrar?</Text>
+          <Text style={styles.welcome}>Bienvenido de nuevo</Text>
+          <Text style={styles.sub}>Inicia sesión para seguir donando.</Text>
 
-          {ROLES.map((r) => {
-            const selected = role === r.key;
-            return (
-              <Pressable
-                key={r.key}
-                onPress={() => setRole(r.key)}
-                style={[styles.roleCard, selected && styles.roleCardActive]}
-              >
-                <Text style={styles.roleEmoji}>{r.emoji}</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.roleTitle, selected && { color: colors.primary }]}>
-                    {r.title}
-                  </Text>
-                  <Text style={styles.roleSubtitle}>{r.subtitle}</Text>
-                </View>
-                <View style={[styles.radio, selected && styles.radioActive]}>
-                  {selected && <View style={styles.radioInner} />}
-                </View>
-              </Pressable>
-            );
-          })}
-
-          <View style={{ height: spacing.lg }} />
+          <View style={{ height: spacing.xl }} />
 
           <Field
             label="Correo"
@@ -126,47 +96,10 @@ export default function Login() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
-  scroll: { padding: spacing.xl, paddingBottom: spacing.xxl },
-  header: { alignItems: 'center', marginBottom: spacing.xl, marginTop: spacing.sm },
-  question: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: spacing.md,
-  },
-  roleCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    backgroundColor: colors.white,
-  },
-  roleCardActive: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primarySoft,
-  },
-  roleEmoji: { fontSize: 22, marginRight: spacing.md },
-  roleTitle: { fontSize: 15, fontWeight: '700', color: colors.text },
-  roleSubtitle: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
-  radio: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 2,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radioActive: { borderColor: colors.primary },
-  radioInner: {
-    width: 11,
-    height: 11,
-    borderRadius: 6,
-    backgroundColor: colors.primary,
-  },
+  scroll: { padding: spacing.xl, paddingBottom: spacing.xxl, flexGrow: 1, justifyContent: 'center' },
+  header: { alignItems: 'center', marginBottom: spacing.xl },
+  welcome: { fontSize: 22, fontWeight: '800', color: colors.text, textAlign: 'center' },
+  sub: { fontSize: 14, color: colors.textMuted, textAlign: 'center', marginTop: spacing.xs },
   error: {
     color: colors.primary,
     fontSize: 13,
@@ -174,11 +107,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     textAlign: 'center',
   },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: spacing.xl,
-  },
+  footer: { flexDirection: 'row', justifyContent: 'center', marginTop: spacing.xl },
   footerText: { color: colors.textMuted, fontSize: 14 },
   footerLink: { color: colors.primary, fontSize: 14, fontWeight: '700' },
 });

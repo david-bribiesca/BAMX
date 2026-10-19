@@ -2,48 +2,50 @@
 // focused on UI (see AGENTS.md: "Keep DB queries in separate files").
 import { supabase } from './supabase';
 
-export type Campaign = {
+export type DonationStatus = 'pendiente' | 'en_camino' | 'entregada';
+
+// A drop-off point ("punto de acopio"): what it accepts and what it needs now.
+export type Location = {
   id: string;
   name: string;
-  description: string | null;
-  location_name: string | null;
-  goal_meals: number | null;
+  address: string | null;
+  lat: number | null;
+  lng: number | null;
+  accepted_goods: string[];
+  needed_goods: string[];
 };
-
-export type DonationStatus = 'pendiente' | 'en_camino' | 'entregada';
 
 export type Donation = {
   id: string;
   donor_id: string;
-  campaign_id: string | null;
+  location_id: string | null;
   kind: 'especie' | 'dinero';
   items: string;
   quantity: number;
   status: DonationStatus;
   created_at: string;
-  // Joined campaign name (from the select below).
-  campaigns?: { name: string } | null;
+  // Joined location name (from the select below).
+  locations?: { name: string } | null;
 };
 
-// READ: active campaigns shown on the donor home ("Campañas activas").
-export async function getActiveCampaigns(): Promise<Campaign[]> {
+// READ: active drop-off locations for the map.
+export async function getLocations(): Promise<Location[]> {
   const { data, error } = await supabase
-    .from('campaigns')
-    .select('id, name, description, location_name, goal_meals')
+    .from('locations')
+    .select('id, name, address, lat, lng, accepted_goods, needed_goods')
     .eq('is_active', true)
-    .order('created_at', { ascending: false });
+    .order('name', { ascending: true });
 
   if (error) throw error;
-  return (data ?? []) as Campaign[];
+  return (data ?? []) as Location[];
 }
 
-// READ: the signed-in donor's own donations ("Mis donaciones").
-// RLS ensures only their rows come back.
+// READ: the signed-in donor's own donations. RLS returns only their rows.
 export async function getMyDonations(userId: string): Promise<Donation[]> {
   const { data, error } = await supabase
     .from('donations')
     .select(
-      'id, donor_id, campaign_id, kind, items, quantity, status, created_at, campaigns(name)'
+      'id, donor_id, location_id, kind, items, quantity, status, created_at, locations(name)'
     )
     .eq('donor_id', userId)
     .order('created_at', { ascending: false });
@@ -54,26 +56,26 @@ export async function getMyDonations(userId: string): Promise<Donation[]> {
 
 export type NewDonation = {
   donorId: string;
-  campaignId: string | null;
+  locationId: string | null;
   kind: 'especie' | 'dinero';
   items: string;
   quantity: number;
 };
 
-// SAVE: create a new donation ("Nueva Donación").
+// SAVE: create a new in-kind donation.
 export async function createDonation(input: NewDonation): Promise<Donation> {
   const { data, error } = await supabase
     .from('donations')
     .insert({
       donor_id: input.donorId,
-      campaign_id: input.campaignId,
+      location_id: input.locationId,
       kind: input.kind,
       items: input.items,
       quantity: input.quantity,
       status: 'pendiente',
     })
     .select(
-      'id, donor_id, campaign_id, kind, items, quantity, status, created_at, campaigns(name)'
+      'id, donor_id, location_id, kind, items, quantity, status, created_at, locations(name)'
     )
     .single();
 

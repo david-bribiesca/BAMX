@@ -1,32 +1,22 @@
-// Sign-up screen with role selection (Donador / Necesito apoyo / Staff).
-// full_name + role are passed as user metadata; a DB trigger copies them into
-// the profiles table (see supabase/schema.sql).
+// Sign-up screen (donor-only). full_name is passed as user metadata; a DB
+// trigger copies it into the profiles table with role 'donor' (see schema.sql).
 import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import { Link, useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Brand } from '@/components/Brand';
 import { Field, PrimaryButton } from '@/components/ui';
 import { supabase } from '@/lib/supabase';
-import { colors, radius, spacing } from '@/theme';
-
-const ROLES = [
-  { key: 'donor', title: 'Donador', emoji: '💛' },
-  { key: 'beneficiary', title: 'Necesito apoyo', emoji: '🙌' },
-  { key: 'staff', title: 'Staff BAMX', emoji: '⭐' },
-] as const;
+import { colors, spacing } from '@/theme';
 
 export default function SignUp() {
-  const router = useRouter();
-  const [role, setRole] = useState<string>('donor');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -52,7 +42,7 @@ export default function SignUp() {
       email: email.trim(),
       password,
       options: {
-        data: { full_name: fullName.trim(), role },
+        data: { full_name: fullName.trim(), role: 'donor' },
       },
     });
     setLoading(false);
@@ -83,31 +73,8 @@ export default function SignUp() {
         >
           <View style={styles.header}>
             <Brand tagline={false} />
-            <Text style={styles.title}>Crea tu cuenta</Text>
+            <Text style={styles.title}>Crea tu cuenta de donador</Text>
           </View>
-
-          <Text style={styles.question}>¿Cómo quieres registrarte?</Text>
-          <View style={styles.rolesRow}>
-            {ROLES.map((r) => {
-              const selected = role === r.key;
-              return (
-                <Pressable
-                  key={r.key}
-                  onPress={() => setRole(r.key)}
-                  style={[styles.rolePill, selected && styles.rolePillActive]}
-                >
-                  <Text style={styles.roleEmoji}>{r.emoji}</Text>
-                  <Text
-                    style={[styles.rolePillText, selected && { color: colors.primary }]}
-                  >
-                    {r.title}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-
-          <View style={{ height: spacing.lg }} />
 
           <Field
             label="Nombre completo"
@@ -134,11 +101,7 @@ export default function SignUp() {
           {error && <Text style={styles.error}>{error}</Text>}
           {notice && <Text style={styles.notice}>{notice}</Text>}
 
-          <PrimaryButton
-            label="Registrarme"
-            onPress={onSignUp}
-            loading={loading}
-          />
+          <PrimaryButton label="Registrarme" onPress={onSignUp} loading={loading} />
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>¿Ya tienes cuenta? </Text>
@@ -154,36 +117,9 @@ export default function SignUp() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
-  scroll: { padding: spacing.xl, paddingBottom: spacing.xxl },
-  header: { alignItems: 'center', marginBottom: spacing.xl, marginTop: spacing.sm },
-  title: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: colors.text,
-    marginTop: spacing.lg,
-  },
-  question: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: spacing.md,
-  },
-  rolesRow: { flexDirection: 'row', gap: spacing.sm },
-  rolePill: {
-    flex: 1,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    paddingVertical: spacing.md,
-    backgroundColor: colors.white,
-  },
-  rolePillActive: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primarySoft,
-  },
-  roleEmoji: { fontSize: 20, marginBottom: 4 },
-  rolePillText: { fontSize: 12, fontWeight: '700', color: colors.text, textAlign: 'center' },
+  scroll: { padding: spacing.xl, paddingBottom: spacing.xxl, flexGrow: 1, justifyContent: 'center' },
+  header: { alignItems: 'center', marginBottom: spacing.xl },
+  title: { fontSize: 20, fontWeight: '800', color: colors.text, marginTop: spacing.lg, textAlign: 'center' },
   error: {
     color: colors.primary,
     fontSize: 13,
@@ -198,11 +134,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     textAlign: 'center',
   },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: spacing.xl,
-  },
+  footer: { flexDirection: 'row', justifyContent: 'center', marginTop: spacing.xl },
   footerText: { color: colors.textMuted, fontSize: 14 },
   footerLink: { color: colors.primary, fontSize: 14, fontWeight: '700' },
 });
