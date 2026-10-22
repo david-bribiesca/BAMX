@@ -32,8 +32,9 @@ export const spacing = {
   xxl: 32,
 };
 
-// Status chips used across the app (Entregada / En camino / Pendiente).
+// Status chips used across the app (Confirmada / Entregada / En camino / Pendiente).
 export const statusMeta: Record<string, { label: string; color: string }> = {
+  confirmada: { label: 'Confirmada', color: colors.success },
   entregada: { label: 'Entregada', color: colors.success },
   en_camino: { label: 'En camino', color: colors.warning },
   pendiente: { label: 'Pendiente', color: colors.pending },

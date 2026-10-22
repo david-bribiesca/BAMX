@@ -16,7 +16,7 @@ import { useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusChip } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
-import { getMyDonations, type Donation } from '@/lib/db';
+import { getMyDonations, isConfirmed, type Donation } from '@/lib/db';
 import { colors, radius, spacing } from '@/theme';
 
 // Donor levels, keyed on total units ("despensas") donated.
@@ -51,17 +51,20 @@ export default function Impact() {
     }, [load])
   );
 
+  // Stats only count donations an admin has confirmed; pending ones are listed below.
   const stats = useMemo(() => {
-    const units = donations
+    const confirmed = donations.filter(isConfirmed);
+    const units = confirmed
       .filter((d) => d.kind === 'especie')
       .reduce((sum, d) => sum + (d.quantity ?? 0), 0);
     const locations = new Set(
-      donations.map((d) => d.location_id).filter(Boolean)
+      confirmed.map((d) => d.location_id).filter(Boolean)
     ).size;
     const months = new Set(
-      donations.map((d) => d.created_at?.slice(0, 7)).filter(Boolean)
+      confirmed.map((d) => d.created_at?.slice(0, 7)).filter(Boolean)
     ).size;
-    return { count: donations.length, units, locations, months };
+    const pending = donations.length - confirmed.length;
+    return { count: confirmed.length, units, locations, months, pending };
   }, [donations]);
 
   const levelIdx = LEVELS.reduce(
@@ -199,6 +202,12 @@ export default function Impact() {
 
         {/* Recent donations */}
         <Text style={styles.section}>Mis donaciones</Text>
+        {stats.pending > 0 && (
+          <Text style={styles.pendingNote}>
+            ⏳ {stats.pending} donación(es) pendiente(s) de confirmar. Contarán en tus
+            estadísticas cuando un administrador las apruebe.
+          </Text>
+        )}
         {donations.length === 0 ? (
           <Text style={styles.empty}>
             Aún no has donado. ¡Haz tu primera donación y gana tu primera insignia! 🎁
@@ -321,6 +330,7 @@ const styles = StyleSheet.create({
   },
   shareBtnText: { color: colors.primary, fontSize: 15, fontWeight: '700' },
   empty: { color: colors.textMuted, fontSize: 14, fontStyle: 'italic' },
+  pendingNote: { color: colors.textMuted, fontSize: 13, marginBottom: spacing.md },
   donationCard: {
     backgroundColor: colors.white,
     borderRadius: radius.lg,

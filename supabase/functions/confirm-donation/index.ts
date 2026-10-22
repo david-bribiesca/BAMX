@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
         kind: 'dinero',
         items: 'Donación en dinero',
         quantity: (session.amount_total ?? 0) / 100,
-        status: 'entregada',
+        status: 'confirmada', // Stripe already verified it — no admin approval needed
         stripe_session_id: sessionId,
       });
       if (error) return json({ error: error.message }, 500);

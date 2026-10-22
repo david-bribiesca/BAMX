@@ -10,7 +10,7 @@ import {
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 
-export type Role = 'donor' | 'beneficiary' | 'staff';
+export type Role = 'donor' | 'beneficiary' | 'staff' | 'admin';
 
 export type Profile = {
   id: string;

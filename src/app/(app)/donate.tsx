@@ -91,7 +91,10 @@ export default function Donate() {
         items: item,
         quantity: qty,
       });
-      Alert.alert('¡Listo! 🎉', '¡Tu donación fue registrada con éxito!');
+      Alert.alert(
+        '¡Listo! 🎉',
+        'Tu donación fue registrada y está pendiente de confirmación por un administrador.'
+      );
       setItem('');
       setQuantity('');
       router.replace('/(app)/impact');

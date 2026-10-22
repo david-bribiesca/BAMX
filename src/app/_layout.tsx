@@ -9,20 +9,23 @@ import { AuthProvider, useAuth } from '@/lib/auth';
 import { colors } from '@/theme';
 
 function RootNavigator() {
-  const { session, loading } = useAuth();
+  const { session, profile, loading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  const isAdmin = profile?.role === 'admin';
 
   useEffect(() => {
     if (loading) return;
-    const inAuthGroup = segments[0] === '(auth)';
+    const group = segments[0];
 
-    if (!session && !inAuthGroup) {
-      router.replace('/(auth)/login');
-    } else if (session && inAuthGroup) {
+    if (!session) {
+      if (group !== '(auth)') router.replace('/(auth)/login');
+    } else if (isAdmin && group !== '(admin)') {
+      router.replace('/(admin)');
+    } else if (!isAdmin && group !== '(app)') {
       router.replace('/(app)/map');
     }
-  }, [session, loading, segments]);
+  }, [session, isAdmin, loading, segments]);
 
   if (loading) {
     return (
@@ -36,6 +39,7 @@ function RootNavigator() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="(app)" />
+      <Stack.Screen name="(admin)" />
     </Stack>
   );
 }
