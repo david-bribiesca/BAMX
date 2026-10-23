@@ -1,15 +1,11 @@
-// Data-access layer. All Supabase table queries live here so screens stay
-// focused on UI (see AGENTS.md: "Keep DB queries in separate files").
 import { supabase } from './supabase';
 
 export type DonationStatus = 'pendiente' | 'confirmada' | 'en_camino' | 'entregada';
 
-// Only donations an admin has approved (or Stripe has verified) count toward stats.
 export function isConfirmed(d: Pick<Donation, 'status'>): boolean {
   return d.status !== 'pendiente';
 }
 
-// A drop-off point ("punto de acopio"): what it accepts and what it needs now.
 export type Location = {
   id: string;
   name: string;
@@ -29,11 +25,9 @@ export type Donation = {
   quantity: number;
   status: DonationStatus;
   created_at: string;
-  // Joined location name (from the select below).
   locations?: { name: string } | null;
 };
 
-// READ: active drop-off locations for the map.
 export async function getLocations(): Promise<Location[]> {
   const { data, error } = await supabase
     .from('locations')
@@ -45,7 +39,6 @@ export async function getLocations(): Promise<Location[]> {
   return (data ?? []) as Location[];
 }
 
-// READ: the signed-in donor's own donations. RLS returns only their rows.
 export async function getMyDonations(userId: string): Promise<Donation[]> {
   const { data, error } = await supabase
     .from('donations')
@@ -67,7 +60,6 @@ export type NewDonation = {
   quantity: number;
 };
 
-// SAVE: create a new in-kind donation.
 export async function createDonation(input: NewDonation): Promise<Donation> {
   const { data, error } = await supabase
     .from('donations')
@@ -88,13 +80,8 @@ export async function createDonation(input: NewDonation): Promise<Donation> {
   return data as unknown as Donation;
 }
 
-// ---------------------------------------------------------------------------
-// ADMIN — RLS only lets profiles with role 'admin' run these.
-// ---------------------------------------------------------------------------
-
 export type PendingDonation = Donation & { donor_name: string | null };
 
-// READ: every pending donation (all donors), with the donor's name attached.
 export async function getPendingDonations(): Promise<PendingDonation[]> {
   const { data, error } = await supabase
     .from('donations')
@@ -117,7 +104,6 @@ export async function getPendingDonations(): Promise<PendingDonation[]> {
   return rows.map((d) => ({ ...d, donor_name: names.get(d.donor_id) ?? null }));
 }
 
-// SAVE: approve a pending donation -> 'confirmada'.
 export async function approveDonation(id: string): Promise<void> {
   const { data, error } = await supabase
     .from('donations')

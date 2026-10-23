@@ -1,5 +1,3 @@
-// "Mi impacto" — a gamified, motivating view of everything the donor has given:
-// a level/tier with progress to the next, key stats, badges, and recent history.
 import { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -19,7 +17,6 @@ import { useAuth } from '@/lib/auth';
 import { getMyDonations, isConfirmed, type Donation } from '@/lib/db';
 import { colors, radius, spacing } from '@/theme';
 
-// Donor levels, keyed on total units ("despensas") donated.
 const LEVELS = [
   { name: 'Bronce', emoji: '🥉', min: 0 },
   { name: 'Plata', emoji: '🥈', min: 10 },
@@ -38,7 +35,6 @@ export default function Impact() {
     try {
       setDonations(await getMyDonations(session.user.id));
     } catch {
-      // keep whatever we had
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -51,7 +47,6 @@ export default function Impact() {
     }, [load])
   );
 
-  // Stats only count donations an admin has confirmed; pending ones are listed below.
   const stats = useMemo(() => {
     const confirmed = donations.filter(isConfirmed);
     const units = confirmed
@@ -100,7 +95,6 @@ export default function Impact() {
         try {
           await nav.share({ text: message });
         } catch {
-          // user cancelled the native share sheet
         }
         return;
       }
@@ -110,7 +104,6 @@ export default function Impact() {
           window.alert('Tu impacto se copió al portapapeles. 💛');
           return;
         } catch {
-          // fall through to plain alert
         }
       }
       window.alert(message);
@@ -120,7 +113,6 @@ export default function Impact() {
     try {
       await Share.share({ message });
     } catch {
-      // share dismissed / unavailable
     }
   }
 
@@ -154,7 +146,6 @@ export default function Impact() {
           </Text>
         </View>
 
-        {/* Level hero */}
         <View style={styles.hero}>
           <Text style={styles.heroEmoji}>{level.emoji}</Text>
           <Text style={styles.heroLevel}>Donador {level.name}</Text>
@@ -170,7 +161,6 @@ export default function Impact() {
           </Text>
         </View>
 
-        {/* Stat tiles */}
         <View style={styles.statsGrid}>
           <Stat value={stats.count} label="Donaciones" />
           <Stat value={stats.units} label="Despensas" />
@@ -178,7 +168,6 @@ export default function Impact() {
           <Stat value={stats.months} label="Meses activo" />
         </View>
 
-        {/* Badges */}
         <Text style={styles.section}>Insignias</Text>
         <View style={styles.badgeGrid}>
           {badges.map((b) => (
@@ -200,7 +189,6 @@ export default function Impact() {
           <Text style={styles.shareBtnText}>Compartir mi impacto</Text>
         </Pressable>
 
-        {/* Recent donations */}
         <Text style={styles.section}>Mis donaciones</Text>
         {stats.pending > 0 && (
           <Text style={styles.pendingNote}>

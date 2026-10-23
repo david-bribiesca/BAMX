@@ -1,5 +1,3 @@
-// Auth context: exposes the current Supabase session + the user's profile
-// (which carries their role) to the whole app.
 import {
   createContext,
   useContext,
@@ -56,14 +54,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    // 1. Restore any persisted session on launch.
     supabase.auth.getSession().then(async ({ data }) => {
       setSession(data.session);
       await loadProfileFor(data.session);
       setLoading(false);
     });
 
-    // 2. React to login / logout / token refresh.
     const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
       setSession(next);
       loadProfileFor(next);

@@ -1,4 +1,3 @@
-// Admin app: a single screen to approve pending donations per drop-off point.
 import { Stack } from 'expo-router';
 import { Text } from 'react-native';
 import { useAuth } from '@/lib/auth';

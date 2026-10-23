@@ -1,10 +1,7 @@
-// Stripe money-donation flow (via Supabase Edge Functions + Stripe Checkout).
-// 1) create a Checkout session, 2) open Stripe's hosted page, 3) poll to confirm.
 import { Platform } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { supabase } from './supabase';
 
-// Creates a Checkout session, opens Stripe's payment page, returns the session id.
 export async function startMoneyDonation(
   amount: number,
   locationId: string | null
@@ -28,8 +25,6 @@ export async function startMoneyDonation(
   return data.id as string;
 }
 
-// Asks the backend (which asks Stripe) whether the session is paid yet.
-// Returns 'paid' once the donation has been recorded.
 export async function confirmMoneyDonation(sessionId: string): Promise<string> {
   const { data, error } = await supabase.functions.invoke('confirm-donation', {
     body: { sessionId },

@@ -1,5 +1,3 @@
-// Entry route — the root layout's redirect logic sends the user to the right
-// place, so this just shows a spinner while that resolves.
 import { ActivityIndicator, View } from 'react-native';
 import { colors } from '@/theme';
 

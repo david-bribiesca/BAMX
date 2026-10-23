@@ -1,5 +1,3 @@
-// Sign-up screen (donor-only). full_name is passed as user metadata; a DB
-// trigger copies it into the profiles table with role 'donor' (see schema.sql).
 import { useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -52,8 +50,6 @@ export default function SignUp() {
       return;
     }
 
-    // If email confirmation is OFF, a session is returned and the root layout
-    // redirects into the app automatically. If it's ON, session is null.
     if (!data.session) {
       setNotice(
         'Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.'

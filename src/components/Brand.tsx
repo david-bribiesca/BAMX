@@ -1,4 +1,3 @@
-// BAMX wordmark used on the auth screens (matches mockup p.1).
 import { StyleSheet, Text, View } from 'react-native';
 import { colors, radius } from '@/theme';
 

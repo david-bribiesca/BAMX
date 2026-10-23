@@ -1,6 +1,3 @@
-// Admin home — same map of drop-off points as donors see, but selecting a point
-// lists its pending donations, each with an "Aprobar" button. Approving moves the
-// donation from 'pendiente' to 'confirmada', so it starts counting in the donor's stats.
 import { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -117,7 +114,6 @@ export default function AdminScreen() {
           />
         </View>
 
-        {/* Pending donations at the selected location */}
         {selected && (
           <View style={styles.card}>
             <Text style={styles.locName}>{selected.name}</Text>

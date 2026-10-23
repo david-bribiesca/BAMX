@@ -1,6 +1,3 @@
-// Supabase Edge Function: create a Stripe Checkout Session for a money donation.
-// The donor is identified from their JWT; the amount comes from the client.
-// Requires secret: STRIPE_SECRET_KEY (set in Supabase > Edge Functions > Secrets).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const cors = {
@@ -25,7 +22,6 @@ Deno.serve(async (req) => {
       return json({ error: 'Monto inválido' }, 400);
     }
 
-    // Identify the donor from their access token.
     const authHeader = req.headers.get('Authorization') ?? '';
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
@@ -43,8 +39,6 @@ Deno.serve(async (req) => {
       successUrl || 'https://example.com/success?session_id={CHECKOUT_SESSION_ID}'
     );
     params.set('cancel_url', cancelUrl || 'https://example.com/cancel');
-    // Payment methods are configured in the Stripe Dashboard (Settings >
-    // Payment methods); Checkout no longer accepts payment_method_types here.
     params.set('line_items[0][quantity]', '1');
     params.set('line_items[0][price_data][currency]', 'mxn');
     params.set('line_items[0][price_data][unit_amount]', String(Math.round(pesos * 100)));

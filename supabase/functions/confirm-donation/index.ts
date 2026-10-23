@@ -1,7 +1,3 @@
-// Supabase Edge Function: verify a Stripe Checkout session and, if it's paid,
-// record the money donation exactly once (idempotent via stripe_session_id).
-// The client polls this after opening the Stripe payment page.
-// Requires secret: STRIPE_SECRET_KEY. Uses the auto-provided service role key.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const cors = {
@@ -23,7 +19,6 @@ Deno.serve(async (req) => {
     const { sessionId } = await req.json();
     if (!sessionId) return json({ error: 'Falta sessionId' }, 400);
 
-    // Ask Stripe for the authoritative payment status.
     const resp = await fetch(
       `https://api.stripe.com/v1/checkout/sessions/${sessionId}`,
       { headers: { Authorization: `Bearer ${Deno.env.get('STRIPE_SECRET_KEY')}` } }
@@ -32,10 +27,9 @@ Deno.serve(async (req) => {
     if (!resp.ok) return json({ error: session?.error?.message ?? 'Stripe error' }, 400);
 
     if (session.payment_status !== 'paid') {
-      return json({ status: session.payment_status }); // 'unpaid' / 'no_payment_required'
+      return json({ status: session.payment_status });
     }
 
-    // Paid -> record the donation once, bypassing RLS with the service role.
     const admin = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -54,7 +48,7 @@ Deno.serve(async (req) => {
         kind: 'dinero',
         items: 'Donación en dinero',
         quantity: (session.amount_total ?? 0) / 100,
-        status: 'confirmada', // Stripe already verified it — no admin approval needed
+        status: 'confirmada',
         stripe_session_id: sessionId,
       });
       if (error) return json({ error: error.message }, 500);

@@ -1,5 +1,3 @@
-// Root layout: wires up the auth provider and redirects between the auth
-// stack and the app stack based on whether there is a session.
 import { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';

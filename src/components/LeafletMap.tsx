@@ -1,5 +1,3 @@
-// Native (iOS/Android, incl. Expo Go) interactive map: a WebView running
-// Leaflet with OpenStreetMap tiles. Draggable/zoomable; markers at real lat/lng.
 import { useEffect, useMemo, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
@@ -10,8 +8,6 @@ export function LeafletMap({ locations, selectedId, onSelect, height = 320 }: Le
   const webRef = useRef<WebView>(null);
   const readyRef = useRef(false);
 
-  // Build the map HTML only from locations so selecting a marker never reloads
-  // the WebView (which would reset the zoom and swallow the first-tap popup).
   const html = useMemo(() => buildLeafletHtml(locations), [locations]);
 
   function onMessage(e: WebViewMessageEvent) {
@@ -19,11 +15,9 @@ export function LeafletMap({ locations, selectedId, onSelect, height = 320 }: Le
       const msg = JSON.parse(e.nativeEvent.data);
       if (msg?.type === 'select' && msg.id) onSelect(msg.id);
     } catch {
-      // ignore malformed messages
     }
   }
 
-  // When the selection changes (e.g. tapping the list below), pan the map to it.
   useEffect(() => {
     if (!selectedId || !readyRef.current) return;
     webRef.current?.injectJavaScript(

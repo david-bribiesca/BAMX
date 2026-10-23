@@ -1,6 +1,3 @@
-// Builds a self-contained Leaflet map page (OpenStreetMap tiles, no API key).
-// Used by both LeafletMap.native.tsx (WebView) and LeafletMap.web.tsx (iframe).
-// Markers are placed at real lat/lng; tapping one posts its id back to RN.
 import type { Location } from '@/lib/db';
 
 export type LeafletMapProps = {
@@ -67,7 +64,6 @@ export function buildLeafletHtml(locations: Location[]): string {
     var popup = '<b>' + l.name + '</b>' +
       (l.needed && l.needed.length ? '<br/>Necesita: ' + l.needed.join(', ') : '');
     m.bindPopup(popup);
-    // Open the popup and notify RN immediately on the first tap.
     m.on('click', function () { m.openPopup(); post(l.id); });
     markers.push(m);
     byId[l.id] = m;
@@ -78,8 +74,6 @@ export function buildLeafletHtml(locations: Location[]): string {
     map.fitBounds(group.getBounds().pad(0.25));
   }
 
-  // Pan/zoom the map to a location and open its popup, without reloading.
-  // Called from RN when the user picks a point in the list below the map.
   function focusLocation(id) {
     var m = byId[id];
     if (!m) return;

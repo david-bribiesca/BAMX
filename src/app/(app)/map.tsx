@@ -1,6 +1,3 @@
-// Puntos de acopio — a real, draggable OpenStreetMap map (Leaflet, no API key).
-// Markers are drawn at each location's real lat/lng. Tap a marker to select it;
-// the card below shows what that point accepts and needs, then you can donate.
 import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
@@ -62,7 +59,6 @@ export default function MapScreen() {
 
         {error && <Text style={styles.error}>{error}</Text>}
 
-        {/* Real draggable map */}
         <View style={styles.mapWrap}>
           <LeafletMap
             locations={locations}
@@ -72,7 +68,6 @@ export default function MapScreen() {
           />
         </View>
 
-        {/* Selected location detail */}
         {selected && (
           <View style={styles.card}>
             <Text style={styles.locName}>{selected.name}</Text>
@@ -115,7 +110,6 @@ export default function MapScreen() {
           </View>
         )}
 
-        {/* Quick list of all points */}
         <Text style={styles.listHeading}>Todos los puntos</Text>
         {locations.map((loc) => (
           <Pressable

@@ -1,4 +1,3 @@
-// Small shared UI kit reused across BAMX screens (buttons, inputs, chips).
 import {
   ActivityIndicator,
   Pressable,

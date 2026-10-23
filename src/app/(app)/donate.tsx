@@ -1,8 +1,3 @@
-// New donation flow — SAVES an in-kind donation into the backend.
-// Opened from the map with a locationId -> locked to that drop-off point, and
-// the items field becomes a dropdown of what that point accepts.
-// Opened from the Donar tab -> you first pick a point, then the same dropdown.
-// "Donar dinero" is a placeholder for now (wired up in a later prompt).
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -30,7 +25,7 @@ export default function Donate() {
   const router = useRouter();
   const { session } = useAuth();
   const params = useLocalSearchParams<{ locationId?: string }>();
-  const lockedId = params.locationId ?? null; // came from "Donar aquí"
+  const lockedId = params.locationId ?? null;
 
   const [kind, setKind] = useState<Kind>('especie');
   const [locations, setLocations] = useState<Location[]>([]);
@@ -40,7 +35,6 @@ export default function Donate() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // Money-donation (Stripe) state.
   const [money, setMoney] = useState('');
   const [payState, setPayState] = useState<'idle' | 'processing'>('idle');
   const [payError, setPayError] = useState<string | null>(null);
@@ -59,7 +53,6 @@ export default function Donate() {
 
   const currentLoc = locations.find((l) => l.id === locationId) ?? null;
 
-  // Reset the chosen item whenever the location changes (goods differ per point).
   useEffect(() => {
     setItem('');
   }, [locationId]);
@@ -117,7 +110,6 @@ export default function Donate() {
     cancelPayRef.current = false;
     try {
       const sessionId = await startMoneyDonation(amt, locationId);
-      // Poll until Stripe reports the session as paid (~60s max).
       for (let i = 0; i < 20 && !cancelPayRef.current; i++) {
         await sleep(3000);
         if (cancelPayRef.current) break;
@@ -151,7 +143,6 @@ export default function Donate() {
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Type selector */}
         <Text style={styles.label}>Tipo de donación</Text>
         <View style={styles.segment}>
           <Pressable
@@ -173,7 +164,6 @@ export default function Donate() {
         </View>
 
         {kind === 'dinero' ? (
-          // Money donation via Stripe Checkout.
           <View>
             <Field
               label="Monto (MXN)"
@@ -213,7 +203,6 @@ export default function Donate() {
           </View>
         ) : (
           <>
-            {/* Location: locked when arriving from "Donar aquí", else a picker */}
             <Text style={styles.label}>Punto de acopio</Text>
             {lockedId ? (
               <View style={styles.lockedLoc}>
@@ -250,7 +239,6 @@ export default function Donate() {
               </View>
             )}
 
-            {/* Items: dropdown of this point's accepted goods */}
             {currentLoc && currentLoc.accepted_goods.length > 0 ? (
               <Dropdown
                 label="¿Qué vas a donar?"
@@ -286,7 +274,6 @@ export default function Donate() {
   );
 }
 
-// Lightweight cross-platform dropdown (no extra deps).
 function Dropdown({
   label,
   placeholder,

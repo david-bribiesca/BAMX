@@ -1,4 +1,3 @@
-// Login screen (donor-only). Email/password; shows a clear error on bad creds.
 import { useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -36,8 +35,6 @@ export default function Login() {
     });
     setLoading(false);
 
-    // WRONG response -> show error. RIGHT response -> the auth listener in
-    // AuthProvider fires and the root layout redirects into the app.
     if (authError) {
       setError('Correo o contraseña incorrectos. Inténtalo de nuevo.');
     }

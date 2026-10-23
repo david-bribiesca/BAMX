@@ -1,4 +1,3 @@
-// Donor app: a 3-tab bottom navigation — Mapa, Donar, Mi impacto.
 import { Tabs } from 'expo-router';
 import { Text } from 'react-native';
 import { colors } from '@/theme';

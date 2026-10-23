@@ -1,10 +1,3 @@
--- =============================================================================
--- BAMX — "donations only" pivot: drop-off LOCATIONS (puntos de acopio).
--- Run this in the Supabase dashboard: SQL Editor > New query > Run.
--- Safe to re-run.
--- =============================================================================
-
--- 1) LOCATIONS — each point shows what goods it accepts and what it needs now.
 create table if not exists public.locations (
   id             uuid primary key default gen_random_uuid(),
   name           text not null,
@@ -17,20 +10,15 @@ create table if not exists public.locations (
   created_at     timestamptz not null default now()
 );
 
--- 2) Link a donation to the drop-off location it was made at (optional).
 alter table public.donations
   add column if not exists location_id uuid references public.locations (id) on delete set null;
 
--- 3) RLS: any signed-in donor can read active locations.
 alter table public.locations enable row level security;
 
 drop policy if exists "locations_select_active" on public.locations;
 create policy "locations_select_active" on public.locations
   for select to authenticated using (is_active = true);
 
--- =============================================================================
--- SEED — a handful of real-ish Guadalajara drop-off points.
--- =============================================================================
 insert into public.locations (name, address, lat, lng, accepted_goods, needed_goods)
 select * from (values
   ('BAMX Centro',        'Calz. Independencia Sur 123, Centro',   20.6736, -103.3440,
